@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DropMerch - Your Vibe, Your Merch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hero-bg {
+            background: linear-gradient(45deg, #FFC700, #FF007A, #8F00FF);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .funky-btn {
+            transition: all 0.3s ease;
+        }
+        .funky-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.1);
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #8F00FF;
+            animation: spin 1s ease infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#" class="flex items-center space-x-2">
+                 <img src="./assets/98ae8355-9ea4-45e6-8a90-83c31c834dcc.jpg" alt="DropMerch Logo" class="h-8 sm:h-10">
+                <span class="text-xl sm:text-2xl font-bold text-gray-800">DropMerch</span>
+            </a>
+
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center space-x-8 font-semibold">
+                <a href="shop.html" class="text-gray-600 hover:text-purple-600 transition">Shop</a>
+                <a href="#" class="text-gray-600 hover:text-purple-600 transition">Submit Design</a>
+                <a href="#" class="text-gray-600 hover:text-purple-600 transition">About</a>
+                <a href="#" class="text-gray-600 hover:text-purple-600 transition">Contact</a>
+            </div>
+
+            <!-- Icons -->
+            <div class="hidden sm:flex items-center space-x-4 md:space-x-6">
+                <a href="#" class="text-gray-600 hover:text-purple-600 transition"><i class="fas fa-search fa-lg"></i></a>
+                <a href="#" class="text-gray-600 hover:text-purple-600 transition"><i class="fas fa-user fa-lg"></i></a>
+                <a href="#" class="text-gray-600 hover:text-purple-600 transition relative">
+                    <i class="fas fa-heart fa-lg"></i>
+                    <span class="absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                </a>
+                <a href="#" class="text-gray-600 hover:text-purple-600 transition relative">
+                    <i class="fas fa-shopping-cart fa-lg"></i>
+                    <span class="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs rounded-full h-5 w-5 flex items-center justify-center">1</span>
+                </a>
+            </div>
+             <!-- Mobile Menu Button -->
+            <div class="md:hidden flex items-center">
+                 <a href="#" class="text-gray-600 hover:text-purple-600 transition sm:hidden mr-4"><i class="fas fa-shopping-cart fa-lg"></i></a>
+                <button id="mobile-menu-button" class="text-gray-600 hover:text-purple-600 focus:outline-none">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+            </div>
+        </nav>
+         <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#" class="block py-2 text-gray-600 hover:text-purple-600">Shop</a>
+            <a href="#" class="block py-2 text-gray-600 hover:text-purple-600">Submit Design</a>
+            <a href="#" class="block py-2 text-gray-600 hover:text-purple-600">About</a>
+            <a href="#" class="block py-2 text-gray-600 hover:text-purple-600">Contact</a>
+            <div class="border-t border-gray-200 mt-4 pt-4 flex items-center space-x-4">
+                 <a href="#" class="text-gray-600 hover:text-purple-600 transition"><i class="fas fa-search fa-lg"></i></a>
+                <a href="#" class="text-gray-600 hover:text-purple-600 transition"><i class="fas fa-user fa-lg"></i></a>
+                <a href="#" class="text-gray-600 hover:text-purple-600 transition"><i class="fas fa-heart fa-lg"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-bg text-white">
+            <div class="container mx-auto px-6 py-20 md:py-32 text-center">
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-wider mb-4">Your Vibe, Your Merch.</h1>
+                <p class="text-md sm:text-lg md:text-xl mb-8 max-w-2xl mx-auto">University merch that actually slaps. Submit your design, get it voted on, and rock your own creation on campus.</p>
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="#" class="bg-white text-black font-bold py-3 px-8 rounded-full text-lg funky-btn inline-block w-full sm:w-auto">Shop The Drop</a>
+                    <a href="#" class="bg-black/30 text-white font-bold py-3 px-8 rounded-full text-lg funky-btn inline-block w-full sm:w-auto">Create Your Own</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gemini Slogan Generator Section -->
+        <section class="bg-white py-16 md:py-24">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold mb-4">Need Merch Ideas?</h2>
+                <p class="text-gray-600 mb-8 max-w-xl mx-auto">Stuck on a slogan? Drop a keyword and let our AI whip up some fire ideas for your next piece of merch.</p>
+                <div class="max-w-md mx-auto">
+                    <div class="flex flex-col sm:flex-row">
+                        <input id="slogan-keyword" type="text" placeholder="e.g., State University, Coding Club" class="w-full px-4 py-3 rounded-lg sm:rounded-l-lg sm:rounded-r-none border-2 border-gray-200 focus:outline-none focus:border-purple-500 mb-2 sm:mb-0">
+                        <button id="generate-slogan-btn" class="bg-purple-600 text-white font-bold py-3 px-6 rounded-lg sm:rounded-r-lg sm:rounded-l-none hover:bg-purple-700 transition funky-btn">✨ Generate</button>
+                    </div>
+                </div>
+                <div id="slogan-results-container" class="mt-8 text-left max-w-xl mx-auto">
+                    <!-- Slogans will be injected here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Products Section -->
+        <section class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12">Hot Right Now 🔥</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Product Card 1 -->
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover transition-all duration-300 flex flex-col">
+                        <img src="https://placehold.co/400x400/FFC700/000000?text=Cool+Hoodie" alt="Featured Hoodie" class="w-full h-64 object-cover">
+                        <div class="p-6 flex-grow flex flex-col">
+                            <h3 class="font-bold text-xl mb-2">Campus Kings Hoodie</h3>
+                            <p class="text-gray-600 mb-4 product-description">By @ArtGod</p>
+                            <button class="generate-desc-btn text-sm text-purple-600 hover:text-purple-800 font-semibold mb-4 self-start">✨ Generate Description</button>
+                            <div class="flex justify-between items-center mt-auto">
+                                <span class="font-bold text-2xl">$45.00</span>
+                                <button class="bg-purple-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-purple-700 transition">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product Card 2 -->
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover transition-all duration-300 flex flex-col">
+                        <img src="https://placehold.co/400x400/FF007A/FFFFFF?text=Funky+Tee" alt="Featured T-Shirt" class="w-full h-64 object-cover">
+                        <div class="p-6 flex-grow flex flex-col">
+                            <h3 class="font-bold text-xl mb-2">Library Ghost Tee</h3>
+                            <p class="text-gray-600 mb-4 product-description">By @DesignDiva</p>
+                             <button class="generate-desc-btn text-sm text-purple-600 hover:text-purple-800 font-semibold mb-4 self-start">✨ Generate Description</button>
+                            <div class="flex justify-between items-center mt-auto">
+                                <span class="font-bold text-2xl">$25.00</span>
+                                <button class="bg-purple-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-purple-700 transition">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product Card 3 -->
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover transition-all duration-300 flex flex-col">
+                        <img src="https://placehold.co/400x400/8F00FF/FFFFFF?text=Dope+Cap" alt="Featured Cap" class="w-full h-64 object-cover">
+                        <div class="p-6 flex-grow flex flex-col">
+                            <h3 class="font-bold text-xl mb-2">"C's Get Degrees" Cap</h3>
+                            <p class="text-gray-600 mb-4 product-description">By @MemeLord</p>
+                             <button class="generate-desc-btn text-sm text-purple-600 hover:text-purple-800 font-semibold mb-4 self-start">✨ Generate Description</button>
+                            <div class="flex justify-between items-center mt-auto">
+                                <span class="font-bold text-2xl">$22.00</span>
+                                <button class="bg-purple-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-purple-700 transition">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product Card 4 -->
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover transition-all duration-300 flex flex-col">
+                        <img src="https://placehold.co/400x400/34D399/000000?text=Sick+Tote" alt="Featured Tote Bag" class="w-full h-64 object-cover">
+                        <div class="p-6 flex-grow flex flex-col">
+                            <h3 class="font-bold text-xl mb-2">Finals Week Fuel Tote</h3>
+                            <p class="text-gray-600 mb-4 product-description">By @CaffeineQueen</p>
+                             <button class="generate-desc-btn text-sm text-purple-600 hover:text-purple-800 font-semibold mb-4 self-start">✨ Generate Description</button>
+                            <div class="flex justify-between items-center mt-auto">
+                                <span class="font-bold text-2xl">$18.00</span>
+                                <button class="bg-purple-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-purple-700 transition">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="bg-white py-16 md:py-24">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold mb-12">How to Drop Your Merch</h2>
+                <div class="grid md:grid-cols-3 gap-y-12 md:gap-x-12">
+                    <div class="flex flex-col items-center">
+                        <div class="bg-yellow-400 rounded-full h-24 w-24 flex items-center justify-center mb-4">
+                            <i class="fas fa-paint-brush fa-3x text-black"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">1. Submit Your Design</h3>
+                        <p class="text-gray-600">Got a fire idea? Upload your artwork and show us what you've got.</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bg-pink-500 rounded-full h-24 w-24 flex items-center justify-center mb-4">
+                            <i class="fas fa-vote-yea fa-3x text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">2. Get It Voted</h3>
+                        <p class="text-gray-600">Your design goes up for votes. If the people love it, we make it.</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bg-purple-600 rounded-full h-24 w-24 flex items-center justify-center mb-4">
+                            <i class="fas fa-tshirt fa-3x text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">3. See It Worn</h3>
+                        <p class="text-gray-600">We produce and sell the winning designs. You get paid and get clout.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- University Spotlight Section -->
+        <section class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-4">Spotlight: State University</h2>
+                <p class="text-center text-gray-600 mb-12">The freshest drops from the crew.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover transition-all duration-300">
+                        <img src="https://placehold.co/400x300/1E40AF/FFFFFF?text=State+U+Pride" class="w-full h-64 object-cover">
+                        <div class="p-6">
+                            <h3 class="font-bold text-xl mb-2"> some Tee</h3>
+                            <p class="text-gray-600 mb-4">Classic look, modern fit.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover transition-all duration-300">
+                        <img src="https://placehold.co/400x300/D97706/FFFFFF?text=Go+Bulldogs!" class="w-full h-64 object-cover">
+                        <div class="p-6">
+                            <h3 class="font-bold text-xl mb-2"> Vintage Sweatshirt</h3>
+                            <p class="text-gray-600 mb-4">Rep the team in style.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover transition-all duration-300">
+                        <img src="https://placehold.co/400x300/9333EA/FFFFFF?text=Est.+1851" class="w-full h-64 object-cover">
+                        <div class="p-6">
+                            <h3 class="font-bold text-xl mb-2">Established 1001 Hoodie</h3>
+                            <p class="text-gray-600 mb-4">Old school cool.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white">
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center sm:text-left">
+                <div class="mb-8 lg:mb-0">
+                    <h3 class="text-lg font-bold mb-4">DropMerch</h3>
+                    <p class="text-gray-400">Merch by students, for students.</p>
+                </div>
+                <div class="mb-8 lg:mb-0">
+                    <h3 class="text-lg font-bold mb-4">Shop</h3>
+                    <ul>
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">New Arrivals</a></li>
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">T-Shirts</a></li>
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">Hoodies</a></li>
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">Accessories</a></li>
+                    </ul>
+                </div>
+                <div class="mb-8 lg:mb-0">
+                    <h3 class="text-lg font-bold mb-4">Support</h3>
+                    <ul>
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">FAQ</a></li>
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">Shipping & Returns</a></li>
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">Contact Us</a></li>
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Stay Connected</h3>
+                    <p class="text-gray-400 mb-4">Get the latest drops and deals straight to your inbox.</p>
+                    <form class="flex flex-col">
+                        <input type="email" placeholder="Enter your email" class="w-full bg-gray-800 text-white px-4 py-2 rounded-md focus:outline-none mb-2">
+                        <button class="bg-purple-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-purple-700 transition w-full">Subscribe</button>
+                    </form>
+                    <div class="flex space-x-4 mt-4 justify-center sm:justify-start">
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-tiktok fa-lg"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-6 text-center text-gray-500">
+                <p>&copy; 2024 DropMerch. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- Gemini API Integration ---
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+        function showLoading(container) {
+            container.innerHTML = '<div class="flex justify-center items-center p-4"><div class="spinner"></div></div>';
+        }
+
+        // --- Slogan Generator ---
+        const sloganBtn = document.getElementById('generate-slogan-btn');
+        const sloganKeywordInput = document.getElementById('slogan-keyword');
+        const sloganResultsContainer = document.getElementById('slogan-results-container');
+
+        sloganBtn.addEventListener('click', async () => {
+            const keyword = sloganKeywordInput.value.trim();
+            if (!keyword) {
+                sloganResultsContainer.innerHTML = '<p class="text-red-500 text-center">Please enter a keyword!</p>';
+                return;
+            }
+
+            showLoading(sloganResultsContainer);
+
+            const prompt = `Generate 5 short, catchy, Gen-Z style slogans for university merch related to "${keyword}". The slogans should be cool, maybe a little edgy or funny. Format them as a numbered list.`;
+
+            try {
+                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
+                
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    const formattedText = text.replace(/\n/g, '<br>');
+                    sloganResultsContainer.innerHTML = `<div class="bg-gray-100 p-4 rounded-lg">${formattedText}</div>`;
+                } else {
+                    throw new Error("No content received from API.");
+                }
+
+            } catch (error) {
+                console.error("Error generating slogans:", error);
+                sloganResultsContainer.innerHTML = `<p class="text-red-500 text-center">Oops! Something went wrong. Please try again.</p>`;
+            }
+        });
+
+        // --- Product Description Generator ---
+        const descBtns = document.querySelectorAll('.generate-desc-btn');
+        descBtns.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const card = e.target.closest('.p-6');
+                const title = card.querySelector('h3').innerText;
+                const descriptionP = card.querySelector('.product-description');
+                
+                descriptionP.innerHTML = '<div class="spinner h-5 w-5"></div>';
+                e.target.disabled = true;
+
+                const prompt = `Write a short, fun, and energetic product description (2-3 sentences) for a piece of university merch titled "${title}". Use a Gen-Z tone of voice.`;
+                
+                try {
+                    const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
+                    
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        descriptionP.innerText = text;
+                    } else {
+                        throw new Error("No content received from API.");
+                    }
+
+                } catch (error) {
+                    console.error("Error generating description:", error);
+                    descriptionP.innerText = "By @CreatorName"; 
+                } finally {
+                    e.target.style.display = 'none';
+                }
+            });
+        });
+
+        // --- Mobile menu toggle ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>
