@@ -3,8 +3,10 @@
 @tailwind utilities;
 
 /* Use Inter as in your HTML */
-body { font-family: 'Inter', sans-serif; }
-
+body {
+  background: linear-gradient(135deg, #f3f4f6 0%, #f9a8d4 100%);
+  font-family: 'Inter', sans-serif;
+}
 /* Hero gradient and global custom utilities (copied & tuned) */
 .hero-bg {
   background: linear-gradient(45deg, #FFC700, #FF007A, #8F00FF);

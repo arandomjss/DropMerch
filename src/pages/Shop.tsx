@@ -62,7 +62,14 @@ export default function Shop() {
         <section className="w-full lg:w-3/4">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
             {loading ? (
-              <div className="col-span-full text-center py-12"><div className="spinner mx-auto" /></div>
+              Array.from({ length: 6 }).map((_, i) => (
+                <ProductCard
+                  key={`skeleton-${i}`}
+                  product={{ id: "", name: "", price: 0 }}
+                  index={i}
+                  loading={true}
+                />
+              ))
             ) : (
               (products.length ? products : placeholders).map((p, i) => (
                 <ProductCard key={p.id} product={p as any} index={i} />

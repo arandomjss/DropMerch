@@ -9,7 +9,7 @@ export default function Header() {
     <header className="header-sticky bg-white/80 sticky top-0 z-50 shadow-sm">
       <nav className="container-wide flex items-center justify-between py-4">
         <div className="flex items-center gap-3">
-          <img src="/assets/logo.png" alt="DropMerch Logo" className="h-8 sm:h-10" />
+          <img src="/assets/logo.jpg" alt="DropMerch Logo" className="h-8 sm:h-10" />
           <Link to="/" className="text-xl sm:text-2xl font-bold text-gray-800">DropMerch</Link>
         </div>
 
