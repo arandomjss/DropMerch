@@ -1,3 +1,7 @@
+import { useAuth } from "../context/AuthContext";
+import { supabase } from "../lib/supabaseClient";
+import { useEffect, useState } from "react";
+
 function Orders() {
   return (
     <div>

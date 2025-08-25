@@ -1,8 +1,10 @@
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+import { supabase } from "../lib/supabaseClient";
 
 export default function Cart() {
   const { cart, removeFromCart, clearCart } = useCart();
-
+  const { user } = useAuth();
   const total = cart.reduce((sum: number, item: { price: number; quantity: number }) => sum + item.price * item.quantity, 0);
 
   return (
