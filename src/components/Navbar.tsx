@@ -31,6 +31,7 @@ export default function Navbar() {
           <Link to="/orders" className="hover:text-indigo-600 transition-colors">Orders</Link>
           <Link to="/about" className="hover:text-indigo-600 transition-colors">About</Link>
           <Link to="/cart" className="hover:text-indigo-600 transition-colors">Cart</Link>
+          <Link to="/design-studio" className="hover:text-indigo-600 transition-colors">Design Studio</Link>
           {user ? (
             <button
               onClick={async () => { await supabase.auth.signOut(); }}

@@ -10,6 +10,7 @@ import About from "./pages/About";
 import Orders from "./pages/Orders";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import DesignStudio from "./pages/DesignStudio";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
                   <Orders />
                 </PrivateRoute>
               } />
+              <Route path="/design-studio" element={<DesignStudio />} />
             </Routes>
           </main>
         </Router>

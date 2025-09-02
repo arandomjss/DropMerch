@@ -11,10 +11,27 @@ export default function Login() {
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setError(error.message);
-    } else {
+    } else if (data && data.user) {
+      // After login, get the session user and upsert into custom users table
+      const { data: sessionData } = await supabase.auth.getSession();
+      const sessionUser = sessionData?.session?.user;
+      if (sessionUser) {
+        console.log('Login: upserting user from session', sessionUser.id, sessionUser.email);
+        const { error: userUpsertError } = await supabase.from("users").upsert([
+          {
+            id: sessionUser.id,
+            email: sessionUser.email,
+          },
+        ], { onConflict: "id" });
+        if (userUpsertError) {
+          console.error("User upsert error:", userUpsertError);
+        } else {
+          console.log('User upserted successfully');
+        }
+      }
       navigate("/");
     }
   }
@@ -49,4 +66,4 @@ export default function Login() {
       </div>
     </div>
   );
-}
+} 

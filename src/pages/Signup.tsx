@@ -11,10 +11,24 @@ export default function Signup() {
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) {
       setError(error.message);
-    } else {
+    } else if (data && data.user) {
+      // Debug: log user info before insert
+      console.log('Signup: inserting user', data.user.id, data.user.email);
+      // Insert user into custom users table
+      const { error: userInsertError } = await supabase.from("users").insert([
+        {
+          id: data.user.id,
+          email: data.user.email,
+        },
+      ]);
+      if (userInsertError) {
+        console.error("User insert error:", userInsertError);
+      } else {
+        console.log('User inserted successfully');
+      }
       navigate("/");
     }
   }
@@ -49,4 +63,4 @@ export default function Signup() {
       </div>
     </div>
   );
-}
+} 
