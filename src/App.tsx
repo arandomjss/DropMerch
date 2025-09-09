@@ -11,6 +11,12 @@ import Orders from "./pages/Orders";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import DesignStudio from "./pages/DesignStudio";
+import AdminRoute from './components/AdminRoute';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminProducts from "./pages/AdminProducts";
+import AdminOrders from "./pages/AdminOrders";
+import AdminUsers from "./pages/AdminUsers";
+import AdminDesignApprovals from "./pages/AdminDesignApprovals";
 
 function App() {
   return (
@@ -33,6 +39,11 @@ function App() {
                 </PrivateRoute>
               } />
               <Route path="/design-studio" element={<DesignStudio />} />
+              <Route path="/admin" element={ <AdminRoute> <AdminDashboard /> </AdminRoute>}/>
+              <Route path="/admin/products" element={ <AdminRoute> <AdminProducts /> </AdminRoute>}/>
+              <Route path="/admin/orders" element={ <AdminRoute> <AdminOrders /> </AdminRoute>}/>
+              <Route path="/admin/users" element={ <AdminRoute> <AdminUsers /> </AdminRoute>}/>
+              <Route path="/admin/design-approvals" element={ <AdminRoute> <AdminDesignApprovals /> </AdminRoute>}/>
             </Routes>
           </main>
         </Router>

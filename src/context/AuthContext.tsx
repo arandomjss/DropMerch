@@ -5,16 +5,35 @@ const AuthContext = createContext<any>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get current user on mount
-    const session = supabase.auth.getSession().then(({ data }) => {
-      setUser(data?.session?.user ?? null);
-    });
+    const getUserWithRole = async () => {
+      setLoading(true);
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
+        // Fetch from your users table
+        const { data: userProfile } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", authUser.id)
+          .single();
+        if (userProfile) {
+          setUser({ ...authUser, ...userProfile }); // Merge auth and profile
+        } else {
+          setUser(authUser);
+        }
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    };
+
+    getUserWithRole();
 
     // Listen for auth changes
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    const { data: listener } = supabase.auth.onAuthStateChange(() => {
+      getUserWithRole();
     });
 
     return () => {
@@ -23,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

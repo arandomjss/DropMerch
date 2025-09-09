@@ -7,7 +7,6 @@ import React, { useState } from "react";
 export default function Navbar() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
-
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-md">
       <div className="flex items-center justify-between px-4 py-3 md:px-8">
@@ -32,6 +31,12 @@ export default function Navbar() {
           <Link to="/about" className="hover:text-indigo-600 transition-colors">About</Link>
           <Link to="/cart" className="hover:text-indigo-600 transition-colors">Cart</Link>
           <Link to="/design-studio" className="hover:text-indigo-600 transition-colors">Design Studio</Link>
+           {/* Admin link for admin users */}
+          {user && user.role === "admin" && (
+            <Link to="/admin" className="font-semibold text-purple-600 hover:underline">
+              Admin
+            </Link>
+          )}
           {user ? (
             <button
               onClick={async () => { await supabase.auth.signOut(); }}
@@ -51,6 +56,16 @@ export default function Navbar() {
           <Link to="/orders" onClick={() => setOpen(false)}>Orders</Link>
           <Link to="/about" onClick={() => setOpen(false)}>About</Link>
           <Link to="/cart" onClick={() => setOpen(false)}>Cart</Link>
+          <Link to="/design-studio" onClick={() => setOpen(false)}>Design Studio</Link>
+          {user && user.role === "admin" && (
+            <Link
+              to="/admin"
+              onClick={() => setOpen(false)}
+              className="font-semibold text-purple-600"
+            >
+              Admin
+            </Link>
+          )}
           {user ? (
             <button
               onClick={async () => { await supabase.auth.signOut(); setOpen(false); }}
