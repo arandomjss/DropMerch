@@ -17,6 +17,7 @@ import AdminProducts from "./pages/AdminProducts";
 import AdminOrders from "./pages/AdminOrders";
 import AdminUsers from "./pages/AdminUsers";
 import AdminDesignApprovals from "./pages/AdminDesignApprovals";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
               <Route path="/admin/orders" element={ <AdminRoute> <AdminOrders /> </AdminRoute>}/>
               <Route path="/admin/users" element={ <AdminRoute> <AdminUsers /> </AdminRoute>}/>
               <Route path="/admin/design-approvals" element={ <AdminRoute> <AdminDesignApprovals /> </AdminRoute>}/>
+              <Route path="/profile" element={<Profile />} />
             </Routes>
           </main>
         </Router>

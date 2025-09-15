@@ -37,16 +37,9 @@ export default function Navbar() {
               Admin
             </Link>
           )}
-          {user ? (
-            <button
-              onClick={async () => { await supabase.auth.signOut(); }}
-              className="hover:text-indigo-600 transition-colors"
-            >
-              Logout
-            </button>
-          ) : (
-            <Link to="/login" className="hover:text-indigo-600 transition-colors">Login</Link>
-          )}
+          <Link to="/profile" className="hover:underline">
+            Profile
+          </Link>
         </div>
       </div>
       {/* Mobile menu */}
