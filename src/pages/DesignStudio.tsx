@@ -2,88 +2,148 @@ import React, { useRef, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../context/AuthContext";
 
-const COLORS = ["#000", "#a78bfa", "#f9a8d4", "#7dd3fc"];
-const SIZES = [2, 4, 8, 16];
+const PRESET_COLORS = [
+  "#000000", "#ffffff", "#a78bfa", "#f9a8d4", "#7dd3fc", "#f87171", "#fbbf24", "#34d399", "#60a5fa", "#6366f1", "#d946ef"
+];
+const SIZES = [2, 4, 8, 16, 24, 32];
+const SHAPES = ["none", "rectangle", "circle", "line"];
 
 const DesignStudio: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [drawing, setDrawing] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"upload" | "draw">("draw");
-  const [color, setColor] = useState(COLORS[0]);
+  const [color, setColor] = useState("#000000");
+  const [customColor, setCustomColor] = useState("#000000");
   const [size, setSize] = useState(SIZES[0]);
+  const [isEraser, setIsEraser] = useState(false);
+  const [shape, setShape] = useState("none");
+  const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(null);
+  const [canvasDims, setCanvasDims] = useState({ width: 800, height: 500 });
+  const [activeTab, setActiveTab] = useState<"upload" | "draw">("draw");
   const { user } = useAuth();
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+
+  // Responsive canvas size
+  React.useEffect(() => {
+    const updateDims = () => {
+      if (window.innerWidth < 600) setCanvasDims({ width: 320, height: 400 });
+      else if (window.innerWidth < 900) setCanvasDims({ width: 500, height: 400 });
+      else setCanvasDims({ width: 800, height: 500 });
+    };
+    updateDims();
+    window.addEventListener("resize", updateDims);
+    return () => window.removeEventListener("resize", updateDims);
+  }, []);
 
   // Drawing handlers
-  const startDrawing = (e: React.MouseEvent) => {
-    setDrawing(true);
-    draw(e);
-  };
-
-  const endDrawing = () => {
-    setDrawing(false);
-    if (canvasRef.current) {
-      const ctx = canvasRef.current.getContext("2d");
-      ctx?.beginPath();
+  const getPos = (e: React.MouseEvent | React.TouchEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    if ("touches" in e) {
+      const touch = e.touches[0];
+      return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+    } else {
+      return { x: (e as React.MouseEvent).clientX - rect.left, y: (e as React.MouseEvent).clientY - rect.top };
     }
   };
 
-  const draw = (e: React.MouseEvent) => {
-    if (!drawing || !canvasRef.current) return;
-    const ctx = canvasRef.current.getContext("2d");
-    if (!ctx) return;
-    const rect = canvasRef.current.getBoundingClientRect();
-    ctx.lineWidth = size;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = color;
-    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-  };
-
-  const getTouchPos = (touch: Touch) => {
-    if (!canvasRef.current) return { x: 0, y: 0 };
-    const rect = canvasRef.current.getBoundingClientRect();
-    return {
-      x: touch.clientX - rect.left,
-      y: touch.clientY - rect.top,
-    };
-  };
-
-  const startDrawingTouch = (e: React.TouchEvent) => {
+  const startDraw = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    const pos = getPos(e);
     setDrawing(true);
-    drawTouch(e);
-  };
+    setStartPos(pos);
 
-  const endDrawingTouch = () => {
-    setDrawing(false);
-    if (canvasRef.current) {
+    if (shape === "none" && canvasRef.current) {
       const ctx = canvasRef.current.getContext("2d");
-      ctx?.beginPath();
+      if (!ctx) return;
+      ctx.beginPath();
+      ctx.moveTo(pos.x, pos.y);
     }
   };
 
-  const drawTouch = (e: React.TouchEvent) => {
+  const endDraw = (e: React.MouseEvent | React.TouchEvent) => {
     if (!drawing || !canvasRef.current) return;
+    setDrawing(false);
     const ctx = canvasRef.current.getContext("2d");
     if (!ctx) return;
-    const touch = e.touches[0];
-    if (!touch) return;
-    const pos = getTouchPos(touch);
+    if (shape !== "none" && startPos) {
+      const end = getPos(e);
+      ctx.lineWidth = size;
+      ctx.strokeStyle = isEraser ? "#fff" : color;
+      ctx.fillStyle = isEraser ? "#fff" : color;
+      switch (shape) {
+        case "rectangle":
+          ctx.beginPath();
+          ctx.rect(startPos.x, startPos.y, end.x - startPos.x, end.y - startPos.y);
+          ctx.fill();
+          break;
+        case "circle":
+          ctx.beginPath();
+          const radius = Math.sqrt(Math.pow(end.x - startPos.x, 2) + Math.pow(end.y - startPos.y, 2));
+          ctx.arc(startPos.x, startPos.y, radius, 0, 2 * Math.PI);
+          ctx.fill();
+          break;
+        case "line":
+          ctx.beginPath();
+          ctx.moveTo(startPos.x, startPos.y);
+          ctx.lineTo(end.x, end.y);
+          ctx.stroke();
+          break;
+      }
+    }
+    ctx?.beginPath();
+    setStartPos(null);
+  };
+
+  const draw = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!drawing || !canvasRef.current || shape !== "none") return;
+    const ctx = canvasRef.current.getContext("2d");
+    if (!ctx) return;
+    const pos = getPos(e);
     ctx.lineWidth = size;
     ctx.lineCap = "round";
-    ctx.strokeStyle = color;
+    ctx.strokeStyle = isEraser ? "#fff" : color;
     ctx.lineTo(pos.x, pos.y);
     ctx.stroke();
     ctx.beginPath();
     ctx.moveTo(pos.x, pos.y);
   };
 
-  // Upload handler
+  // Touch event wrappers
+  const handleTouchStart = (e: React.TouchEvent) => startDraw(e);
+  const handleTouchEnd = (e: React.TouchEvent) => endDraw(e);
+  const handleTouchMove = (e: React.TouchEvent) => draw(e);
+
+  // Color palette and hex input
+  const handleColorChange = (c: string) => {
+    setColor(c);
+    setCustomColor(c);
+    setIsEraser(false);
+  };
+  const handleHexInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCustomColor(e.target.value);
+    setColor(e.target.value);
+    setIsEraser(false);
+  };
+
+  // Eraser
+  const handleEraser = () => {
+    setIsEraser(true);
+    setShape("none");
+  };
+
+  // Clear canvas
+  const clearCanvas = () => {
+    if (canvasRef.current) {
+      const ctx = canvasRef.current.getContext("2d");
+      ctx?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    }
+  };
+
+  // Upload handler for image files
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -92,29 +152,6 @@ const DesignStudio: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
-
-  // Clear canvas
-  const clearCanvas = () => {
-    if (canvasRef.current) {
-      const ctx = canvasRef.current.getContext("2d");
-      ctx?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-      if (uploadedImage && activeTab === "draw") {
-        const img = new window.Image();
-        img.src = uploadedImage;
-        img.onload = () => ctx?.drawImage(img, 0, 0, canvasRef.current!.width, canvasRef.current!.height);
-      }
-    }
-  };
-
-  // Draw uploaded image on canvas
-  React.useEffect(() => {
-    if (uploadedImage && canvasRef.current && activeTab === "draw") {
-      const ctx = canvasRef.current.getContext("2d");
-      const img = new window.Image();
-      img.src = uploadedImage;
-      img.onload = () => ctx?.drawImage(img, 0, 0, canvasRef.current!.width, canvasRef.current!.height);
-    }
-  }, [uploadedImage, activeTab]);
 
   // Handle upload form submit (for Upload tab)
   const handleUploadSubmit = async (e: React.FormEvent) => {
@@ -141,14 +178,12 @@ const DesignStudio: React.FC = () => {
     }
     const fileExt = file.name.split('.').pop();
     const filePath = `${user.id}/${Date.now()}.${fileExt}`;
-    // Use the correct bucket name (case-sensitive)
     const { error: uploadError } = await supabase.storage
-    .from("designs")
-    .upload(filePath, file, { upsert: true });
+      .from("designs")
+      .upload(filePath, file, { upsert: true });
 
     if (uploadError) {
       setMessage("Failed to upload image.");
-      console.error("Supabase upload error:", uploadError); // <-- Add this line
       setLoading(false);
       return;
     }
@@ -175,11 +210,51 @@ const DesignStudio: React.FC = () => {
     setLoading(false);
   };
 
+  // Save canvas as image and upload
+  const handleSaveCanvas = async () => {
+    if (!canvasRef.current || !user) return;
+    setLoading(true);
+    setMessage("");
+    const dataUrl = canvasRef.current.toDataURL("image/png");
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    const filePath = `${user.id}/${Date.now()}.png`;
+    const { error: uploadError } = await supabase.storage
+      .from("designs")
+      .upload(filePath, blob, { upsert: true });
+
+    if (uploadError) {
+      setMessage("Failed to upload canvas.");
+      setLoading(false);
+      return;
+    }
+
+    const { data } = supabase.storage.from("designs").getPublicUrl(filePath);
+    const image_url = data.publicUrl;
+
+    // Save to designs table
+    const { error } = await supabase.from("designs").insert([
+      {
+        user_id: user.id,
+        title: title || "Untitled Design",
+        image_url,
+        display_on_profile: false,
+      },
+    ]);
+    if (!error) {
+      setTitle("");
+      setMessage("Design saved!");
+    } else {
+      setMessage("Failed to save design.");
+    }
+    setLoading(false);
+  };
+
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center px-2 py-6 bg-genzGray">
-      <div className="w-full max-w-5xl bg-white rounded-xl shadow-lg p-4 md:p-8 flex flex-col md:flex-row gap-8">
+      <div className="w-full max-w-6xl bg-white rounded-xl shadow-lg p-4 md:p-8 flex flex-col md:flex-row gap-8">
         {/* Controls Sidebar */}
-        <div className="md:w-1/3 w-full flex flex-col gap-6">
+        <div className="md:w-1/4 w-full flex flex-col gap-6">
           <h2 className="text-2xl font-bold text-genzPurple mb-2">Design Studio</h2>
           <div className="flex gap-2 mb-4">
             <button
@@ -231,23 +306,51 @@ const DesignStudio: React.FC = () => {
               {message && <div className="text-genzPink">{message}</div>}
             </form>
           )}
+
           {activeTab === "draw" && (
             <div className="flex flex-col gap-4">
+              <label className="block mb-2 font-semibold">Design Title:</label>
+              <input
+                className="border rounded px-2 py-1 mb-2"
+                placeholder="Design Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
               <div>
-                <span className="mr-2 font-semibold">Color:</span>
-                <div className="flex gap-2 mt-2">
-                  {COLORS.map((c) => (
+                <span className="font-semibold">Colors:</span>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {PRESET_COLORS.map((c) => (
                     <button
                       key={c}
-                      className={`w-8 h-8 rounded-full border-2 ${color === c ? "border-genzPurple" : "border-gray-300"}`}
+                      className={`w-7 h-7 rounded-full border-2 ${color === c && !isEraser ? "border-genzPurple" : "border-gray-300"}`}
                       style={{ background: c }}
-                      onClick={() => setColor(c)}
+                      onClick={() => handleColorChange(c)}
+                      aria-label={c}
                     />
                   ))}
+                  <input
+                    type="color"
+                    value={customColor}
+                    onChange={e => handleColorChange(e.target.value)}
+                    className="w-7 h-7 border-2 border-gray-300 rounded-full p-0"
+                    aria-label="Color picker"
+                  />
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-xs">Hex:</span>
+                  <input
+                    type="text"
+                    value={customColor}
+                    onChange={handleHexInput}
+                    className="border rounded px-2 py-1 w-24"
+                    placeholder="#000000"
+                    maxLength={7}
+                  />
                 </div>
               </div>
+
               <div>
-                <span className="mr-2 font-semibold">Brush:</span>
+                <span className="font-semibold">Brush:</span>
                 <select
                   value={size}
                   onChange={e => setSize(Number(e.target.value))}
@@ -256,32 +359,61 @@ const DesignStudio: React.FC = () => {
                   {SIZES.map(s => <option key={s} value={s}>{s}px</option>)}
                 </select>
               </div>
+            
+              <button
+                onClick={handleEraser}
+                className={`px-4 py-2 rounded-lg font-semibold mt-2 ${isEraser ? "bg-genzPink text-white" : "bg-genzGray"}`}
+              >
+                {isEraser ? "Eraser (Active)" : "Eraser"}
+              </button>
+
+             
+              <div>
+                <span className="font-semibold">Shapes:</span>
+                <select
+                  value={shape}
+                  onChange={e => { setShape(e.target.value); setIsEraser(false); }}
+                  className="border rounded px-2 py-1 mt-2"
+                >
+                  {SHAPES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+                </select>
+              </div>
+              {/* Clear */}
               <button
                 onClick={clearCanvas}
                 className="px-4 py-2 rounded-lg bg-genzPink text-white font-semibold mt-2"
               >
                 Clear Canvas
               </button>
+              {/* Save Canvas */}
+              <button
+                onClick={handleSaveCanvas}
+                className="px-4 py-2 rounded-lg bg-genzBlue text-white font-semibold mt-2"
+                disabled={loading}
+              >
+                {loading ? "Saving..." : "Save Canvas as Design"}
+              </button>
+              {message && <div className="text-genzPink">{message}</div>}
             </div>
           )}
         </div>
         {/* Canvas Area */}
-        <div className="md:w-2/3 w-full flex flex-col items-center justify-center">
+        <div className="md:w-3/4 w-full flex flex-col items-center justify-center">
           {activeTab === "draw" && (
             <canvas
               ref={canvasRef}
-              width={window.innerWidth < 600 ? 320 : 500}
-              height={window.innerWidth < 600 ? 240 : 400}
-              className="border rounded-xl bg-white shadow w-full max-w-[500px] h-auto"
-              onMouseDown={startDrawing}
-              onMouseUp={endDrawing}
-              onMouseOut={endDrawing}
+              width={canvasDims.width}
+              height={canvasDims.height}
+              className="border rounded-xl bg-white shadow w-full h-auto"
+              onMouseDown={startDraw}
+              onMouseUp={endDraw}
+              onMouseOut={endDraw}
               onMouseMove={draw}
-              onTouchStart={startDrawingTouch}
-              onTouchEnd={endDrawingTouch}
-              onTouchCancel={endDrawingTouch}
-              onTouchMove={drawTouch}
-              style={{ touchAction: "none" }}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              onTouchCancel={handleTouchEnd}
+              onTouchMove={handleTouchMove}
+              style={{ touchAction: "none", background: "#fff" }}
             />
           )}
           {activeTab === "upload" && uploadedImage && (

@@ -11,7 +11,7 @@ export default function Hero() {
         <a href="/shop" className="bg-white text-genzPurple font-bold py-3 px-8 rounded-full shadow-md hover:scale-105 transition text-lg">
           Shop The Drop
         </a>
-        <a href="#ideas" className="bg-black/30 text-white font-bold py-3 px-8 rounded-full shadow-md hover:scale-105 transition text-lg">
+        <a href="/design-studio" className="bg-black/30 text-white font-bold py-3 px-8 rounded-full shadow-md hover:scale-105 transition text-lg">
           Create Your Own
         </a>
       </div>
