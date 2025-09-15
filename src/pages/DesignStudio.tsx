@@ -45,6 +45,44 @@ const DesignStudio: React.FC = () => {
     ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
   };
 
+  const getTouchPos = (touch: Touch) => {
+    if (!canvasRef.current) return { x: 0, y: 0 };
+    const rect = canvasRef.current.getBoundingClientRect();
+    return {
+      x: touch.clientX - rect.left,
+      y: touch.clientY - rect.top,
+    };
+  };
+
+  const startDrawingTouch = (e: React.TouchEvent) => {
+    setDrawing(true);
+    drawTouch(e);
+  };
+
+  const endDrawingTouch = () => {
+    setDrawing(false);
+    if (canvasRef.current) {
+      const ctx = canvasRef.current.getContext("2d");
+      ctx?.beginPath();
+    }
+  };
+
+  const drawTouch = (e: React.TouchEvent) => {
+    if (!drawing || !canvasRef.current) return;
+    const ctx = canvasRef.current.getContext("2d");
+    if (!ctx) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+    const pos = getTouchPos(touch);
+    ctx.lineWidth = size;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = color;
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+  };
+
   // Upload handler
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -239,6 +277,10 @@ const DesignStudio: React.FC = () => {
               onMouseUp={endDrawing}
               onMouseOut={endDrawing}
               onMouseMove={draw}
+              onTouchStart={startDrawingTouch}
+              onTouchEnd={endDrawingTouch}
+              onTouchCancel={endDrawingTouch}
+              onTouchMove={drawTouch}
               style={{ touchAction: "none" }}
             />
           )}
