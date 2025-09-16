@@ -24,6 +24,8 @@ const DesignStudio: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [drafts, setDrafts] = useState<any[]>([]);
+  const [submissions, setSubmissions] = useState<any[]>([]);
 
   // Responsive canvas size
   React.useEffect(() => {
@@ -210,6 +212,81 @@ const DesignStudio: React.FC = () => {
     setLoading(false);
   };
 
+  // Save as draft
+const handleSaveDraft = async () => {
+    if (!canvasRef.current || !user) return;
+    setLoading(true);
+    setMessage("");
+    const dataUrl = canvasRef.current.toDataURL("image/png");
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    const filePath = `${user.id}/${Date.now()}_draft.png`;
+    const { error: uploadError } = await supabase.storage
+      .from("designs")
+      .upload(filePath, blob, { upsert: true });
+    if (uploadError) {
+      setMessage("Failed to upload draft.");
+      setLoading(false);
+      return;
+    }
+    const { data } = supabase.storage.from("designs").getPublicUrl(filePath);
+    const image_url = data.publicUrl;
+    const { error } = await supabase.from("designs").insert([
+      {
+        user_id: user.id,
+        title: title || "Untitled Draft",
+        image_url,
+        status: "draft",
+        display_on_profile: false,
+      },
+    ]);
+    if (!error) {
+      setTitle("");
+      setMessage("Draft saved!");
+      fetchDrafts(); // Refresh drafts
+    } else {
+      setMessage("Failed to save draft.");
+    }
+    setLoading(false);
+  };
+
+  // Submit for approval
+  const handleSubmitForApproval = async () => {
+    if (!canvasRef.current || !user) return;
+    setLoading(true);
+    setMessage("");
+    const dataUrl = canvasRef.current.toDataURL("image/png");
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    const filePath = `${user.id}/${Date.now()}_submission.png`;
+    const { error: uploadError } = await supabase.storage
+      .from("designs")
+      .upload(filePath, blob, { upsert: true });
+    if (uploadError) {
+      setMessage("Failed to upload submission.");
+      setLoading(false);
+      return;
+    }
+    const { data } = supabase.storage.from("designs").getPublicUrl(filePath);
+    const image_url = data.publicUrl;
+    const { error } = await supabase.from("design_submissions").insert([
+      {
+        user_id: user.id,
+        title: title || "Untitled Submission",
+        image_url,
+        status: "pending",
+      },
+    ]);
+    if (!error) {
+      setTitle("");
+      setMessage("Design submitted for approval!");
+      fetchSubmissions(); // Refresh submissions
+    } else {
+      setMessage("Failed to submit design.");
+    }
+    setLoading(false);
+  };
+
   // Save canvas as image and upload
   const handleSaveCanvas = async () => {
     if (!canvasRef.current || !user) return;
@@ -249,6 +326,42 @@ const DesignStudio: React.FC = () => {
     }
     setLoading(false);
   };
+
+  const fetchDrafts = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from("designs")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("status", "draft");
+      setDrafts(data || []);
+    };
+
+    const fetchSubmissions = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from("design_submissions")
+        .select("*")
+        .eq("user_id", user.id);
+      setSubmissions(data || []);
+    };
+
+    React.useEffect(() => {
+      fetchDrafts();
+      fetchSubmissions();
+    }, [user]);
+
+    const handleLoadDraft = (imageUrl: string) => {
+      if (!canvasRef.current) return;
+      const ctx = canvasRef.current.getContext("2d");
+      const img = new window.Image();
+      img.crossOrigin = "anonymous";
+      img.src = imageUrl;
+      img.onload = () => {
+        ctx?.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
+        ctx?.drawImage(img, 0, 0, canvasRef.current!.width, canvasRef.current!.height);
+      };
+    };
 
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center px-2 py-6 bg-genzGray">
@@ -366,8 +479,6 @@ const DesignStudio: React.FC = () => {
               >
                 {isEraser ? "Eraser (Active)" : "Eraser"}
               </button>
-
-             
               <div>
                 <span className="font-semibold">Shapes:</span>
                 <select
@@ -392,6 +503,22 @@ const DesignStudio: React.FC = () => {
                 disabled={loading}
               >
                 {loading ? "Saving..." : "Save Canvas as Design"}
+              </button>
+              {/* Save as Draft */}
+              <button
+                onClick={handleSaveDraft}
+                className="px-4 py-2 rounded-lg bg-gray-300 text-genzPurple font-semibold mt-2"
+                disabled={loading}
+              >
+                {loading ? "Saving..." : "Save as Draft"}
+              </button>
+              {/* Submit for Approval */}
+              <button
+                onClick={handleSubmitForApproval}
+                className="px-4 py-2 rounded-lg bg-genzPurple text-white font-semibold mt-2"
+                disabled={loading}
+              >
+                {loading ? "Submitting..." : "Submit for Approval"}
               </button>
               {message && <div className="text-genzPink">{message}</div>}
             </div>
@@ -425,8 +552,50 @@ const DesignStudio: React.FC = () => {
           )}
         </div>
       </div>
+      {/* Drafts Section */}
+      <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-4 mt-8">
+        <h3 className="text-lg font-bold text-genzPurple mb-2">Your Drafts</h3>
+        {drafts.length === 0 && <div className="text-genzGray-700">No drafts saved yet.</div>}
+        <div className="grid grid-cols-2 gap-4">
+          {drafts.map((draft) => (
+            <div key={draft.id} className="flex flex-col items-center border rounded-lg p-2">
+              <img src={draft.image_url} alt={draft.title} className="w-24 h-24 object-contain rounded mb-2" />
+              <div className="font-semibold">{draft.title}</div>
+              <a href={draft.image_url} download>
+                <button className="mt-2 text-xs bg-genzBlue text-white px-3 py-1 rounded">Download</button>
+              </a>
+              <button
+                className="mt-2 text-xs bg-genzPurple text-white px-3 py-1 rounded"
+                onClick={() => handleLoadDraft(draft.image_url)}
+              >
+                Load Draft
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Submissions Section */}
+      <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-4 mt-8">
+        <h3 className="text-lg font-bold text-genzPurple mb-2">Designs Sent for Approval</h3>
+        {submissions.length === 0 && <div className="text-genzGray-700">No submissions yet.</div>}
+        <div className="grid grid-cols-2 gap-4">
+          {submissions.map((sub) => (
+            <div key={sub.id} className="flex flex-col items-center border rounded-lg p-2">
+              <img src={sub.image_url} alt={sub.title} className="w-24 h-24 object-contain rounded mb-2" />
+              <div className="font-semibold">{sub.title}</div>
+              <div className={`mt-2 text-xs px-3 py-1 rounded ${
+                sub.status === "pending" ? "bg-yellow-200 text-yellow-800" :
+                sub.status === "approved" ? "bg-green-200 text-green-800" :
+                "bg-red-200 text-red-800"
+              }`}>
+                {sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
-};
+};  
 
 export default DesignStudio;
