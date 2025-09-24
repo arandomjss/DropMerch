@@ -43,36 +43,6 @@ export default function Home() {
   return (
     <>
       <Hero/>
-      <section id="ideas" className="w-full py-16 bg-white flex flex-col items-center px-4">
-        <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-center text-genzPurple">
-          Need Merch Ideas?
-        </h2>
-        <p className="text-lg text-gray-600 mb-8 text-center max-w-xl">
-          Type your campus, club, or vibe and get instant slogan inspiration!
-        </p>
-        <div className="w-full max-w-xl flex flex-col sm:flex-row gap-2 mb-8">
-          <input value={keyword} onChange={e => setKeyword(e.target.value)} type="text" placeholder="e.g., State University" className="flex-1 px-4 h-12 rounded-l-lg border-2 border-genzGray bg-genzGray focus:outline-none" />
-          <button onClick={generate} className="bg-genzPurple text-white px-6 h-12 rounded-r-lg hover:bg-genzPink transition font-bold">
-            ✨ Generate
-          </button>
-        </div>
-        {loading && (
-          <div className="text-genzPurple font-semibold mb-4">Generating...</div>
-        )}
-        {slogans && (
-          <ul className="w-full max-w-xl mx-auto grid gap-3">
-            {slogans.map((s, i) => (
-              <li
-                key={i}
-                className="bg-genzGray rounded-lg px-4 py-3 text-center font-semibold text-gray-800 shadow"
-              >
-                {s}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
       <section className="w-full py-12 bg-gray-50 px-4">
         
           <h2 className="text-2xl font-bold mb-6 text-center">Hot Right Now</h2>
